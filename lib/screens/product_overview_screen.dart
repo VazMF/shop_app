@@ -32,7 +32,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
               });
             },
             icon: Icon(
-              (Icons.more_vert),
+              (Icons.filter_list_alt),
             ),
             itemBuilder: (_) => [
               PopupMenuItem(

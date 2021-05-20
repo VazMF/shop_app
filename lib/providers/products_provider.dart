@@ -55,10 +55,10 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     final Uri url = Uri.parse(
         'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json');
-    http
+    return http
         .post(url,
             body: json.encode({
               'title': product.title,

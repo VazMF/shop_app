@@ -107,17 +107,17 @@ class _AuthCardState extends State<AuthCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An error ocurred!'),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            title: Text('An Error Occurred!'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              )
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -133,12 +133,10 @@ class _AuthCardState extends State<AuthCard> {
     try {
       if (_authMode == AuthMode.Login) {
         // Log user in
-        await Provider.of<Auth>(context, listen: false)
-            .login(_authData['email'], _authData['password']);
+        await Provider.of<Auth>(context, listen: false).login(_authData['email'], _authData['password']);
       } else {
         // Sign user up
-        await Provider.of<Auth>(context, listen: false)
-            .signup(_authData['email'], _authData['password']);
+        await Provider.of<Auth>(context, listen: false).signup(_authData['email'], _authData['password']);
       }
     } on HttpException catch (error) {
       var errorMessage = 'Authentication failed.';

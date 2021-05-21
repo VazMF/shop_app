@@ -8,8 +8,12 @@ import './product.dart';
 
 class ProductsProvider with ChangeNotifier {
   List<Product> _items = [];
+  String authToken;
 
-  var _showFavoritesOnly = false;
+  set auth(String token) {
+    this.authToken = token;
+    notifyListeners();
+  }
 
   List<Product> get items {
     return [..._items];
@@ -25,7 +29,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json');
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$authToken');
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -52,7 +56,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json');
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$authToken');
     try {
       final response = await http.post(
         url,
@@ -83,7 +87,7 @@ class ProductsProvider with ChangeNotifier {
     final prodIndex = _items.indexWhere((product) => product.id == id);
     if (prodIndex >= 0) {
       final Uri url = Uri.parse(
-          'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json');
+          'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -93,12 +97,14 @@ class ProductsProvider with ChangeNotifier {
           }));
       _items[prodIndex] = newProduct;
       notifyListeners();
+    } else {
+      print('...');
     }
   }
 
   Future<void> deleteProduct(String id) async {
     final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json');
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);

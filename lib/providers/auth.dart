@@ -12,7 +12,7 @@ class Auth with ChangeNotifier {
     return _token != null;
   }
 
-  String get toke {
+  String get token {
     if (_expiryDate != null &&
         _expiryDate.isAfter(DateTime.now()) &&
         _token != null) {

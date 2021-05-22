@@ -8,11 +8,17 @@ import './product.dart';
 
 class ProductsProvider with ChangeNotifier {
   List<Product> _items = [];
-  String authToken;
+  String _authToken;
+  String _userId;
 
-  set auth(String token) {
-    this.authToken = token;
-    notifyListeners();
+  ProductsProvider([this._authToken, this._userId, this._items = const []]);
+
+  set authToken(String value) {
+    _authToken = value;
+  }
+
+  set userId(String userIdValue) {
+    _userId = userIdValue;
   }
 
   List<Product> get items {
@@ -27,23 +33,28 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$authToken');
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo"$_userId"' : '';
+    var url = Uri.parse(
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$_authToken&$filterString');
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      final List<Product> loadedProducts = [];
       if (extractedData == null) {
         return;
       }
+      url = Uri.parse(
+          'https://shop-app-3ddab-default-rtdb.firebaseio.com/userFavorites/$_userId.json?auth=$_authToken');
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
+      final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
           id: prodId,
           title: prodData['title'],
           description: prodData['description'],
           price: prodData['price'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite: favoriteData == null ? false : favoriteData[prodId] ?? false,
           imageUrl: prodData['imageUrl'],
         ));
       });
@@ -56,7 +67,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$authToken');
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products.json?auth=$_authToken');
     try {
       final response = await http.post(
         url,
@@ -65,7 +76,7 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
+          'creatorId': _userId,
         }),
       );
       final newProduct = Product(
@@ -87,7 +98,7 @@ class ProductsProvider with ChangeNotifier {
     final prodIndex = _items.indexWhere((product) => product.id == id);
     if (prodIndex >= 0) {
       final Uri url = Uri.parse(
-          'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
+          'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$_authToken');
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -104,7 +115,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final Uri url = Uri.parse(
-        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
+        'https://shop-app-3ddab-default-rtdb.firebaseio.com/products/$id.json?auth=$_authToken');
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);

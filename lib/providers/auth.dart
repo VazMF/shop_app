@@ -17,8 +17,13 @@ class Auth with ChangeNotifier {
         _expiryDate.isAfter(DateTime.now()) &&
         _token != null) {
       return _token;
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  String get userId {
+    return isAuth ? _userId : null;
   }
 
   Future<void> _autehticate(

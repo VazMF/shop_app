@@ -1,9 +1,11 @@
-import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'dart:async';
+
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import '../models/http_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/http_exception.dart';
 
 class Auth with ChangeNotifier {
   String _token;
@@ -12,7 +14,7 @@ class Auth with ChangeNotifier {
   Timer _authTimer;
 
   bool get isAuth {
-    return _token != null;
+    return token != null;
   }
 
   String get token {
@@ -26,13 +28,12 @@ class Auth with ChangeNotifier {
   }
 
   String get userId {
-    return isAuth ? _userId : null;
+    return _userId;
   }
 
   Future<void> _autehticate(
       String email, String password, String urlSegment) async {
-    final Uri url = Uri.parse(
-        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyCm7ByLQcrJexTwnedElVDVk713AyefQEo');
+    final url = 'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyCm7ByLQcrJexTwnedElVDVk713AyefQEo';
     try {
       final response = await http.post(
         url,

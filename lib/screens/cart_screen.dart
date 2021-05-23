@@ -50,13 +50,13 @@ class CartScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
+              itemCount: cart.items.length,
               itemBuilder: (ctx, i) => CartItem(
                   cart.items.values.toList()[i].id,
                   cart.items.keys.toList()[i],
                   cart.items.values.toList()[i].title,
                   cart.items.values.toList()[i].price,
                   cart.items.values.toList()[i].quantity),
-              itemCount: cart.items.length,
             ),
           ),
         ],
@@ -79,6 +79,7 @@ class OrderButton extends StatefulWidget {
 
 class _OrderButtonState extends State<OrderButton> {
   var _isLoading = false;
+  
   @override
   Widget build(BuildContext context) {
     return TextButton(

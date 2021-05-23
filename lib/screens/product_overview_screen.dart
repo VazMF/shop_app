@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/products_provider.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
+import './cart_screen.dart';
+import '../providers/products_provider.dart';
 
 enum FilterOptions {
   Favorite,
@@ -23,8 +24,12 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
     if (_isInit) {
       setState(() {
         _isLoading = true;
@@ -36,6 +41,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
       });
     }
     _isInit = false;
+    super.didChangeDependencies();
   }
 
   @override
@@ -76,7 +82,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
             child: IconButton(
               icon: Icon(Icons.shopping_cart),
               onPressed: () {
-                Navigator.of(context).pushNamed('/cart');
+                Navigator.of(context).pushNamed(CartScreen.routeName);
               },
             ),
           ),
